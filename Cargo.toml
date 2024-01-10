@@ -1,0 +1,13 @@
+[package]
+name = "mdv"
+version = "0.1.0"
+edition = "2021"
+description = "A text-mode Markdown viewer"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.79"
+markdown = "1.0.0-alpha.16"
+nu-ansi-term = "0.49.0"
+textwrap = { version = "0.16.0", features = ["terminal_size"] }
