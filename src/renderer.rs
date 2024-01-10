@@ -6,12 +6,7 @@ use textwrap::{fill, termwidth, Options};
 
 pub struct RenderOptions {
     width: usize,
-    heading_style: Style,
-    emphasis_style: Style,
-    bold_style: Style,
-    link_style: Style,
-    inline_code_style: Style,
-    code_block_border_style: Style,
+    styles: RenderStyles,
 }
 
 impl RenderOptions {
@@ -28,6 +23,23 @@ impl Default for RenderOptions {
     fn default() -> Self {
         Self {
             width: termwidth().min(120),
+            styles: RenderStyles::default(),
+        }
+    }
+}
+
+pub struct RenderStyles {
+    heading_style: Style,
+    emphasis_style: Style,
+    bold_style: Style,
+    link_style: Style,
+    inline_code_style: Style,
+    code_block_border_style: Style,
+}
+
+impl Default for RenderStyles {
+    fn default() -> Self {
+        Self {
             heading_style: Style::default().fg(Color::Purple).bold(),
             emphasis_style: Style::default().italic(),
             bold_style: Style::default().bold(),
@@ -61,12 +73,12 @@ pub fn render(node: &Node, opt: &RenderOptions) -> String {
 pub fn render_heading(heading: &Heading, opt: &RenderOptions) -> String {
     let content = render_nodes(&heading.children, "", opt);
     let content = format!("{} {content}", "#".repeat(heading.depth as usize));
-    let content = opt.heading_style.paint(&content).to_string();
+    let content = opt.styles.heading_style.paint(&content).to_string();
     format!("{}\n", opt.wrap(content))
 }
 
 pub fn render_link(link: &Link, opt: &RenderOptions) -> String {
-    opt.link_style.paint(&link.url).to_string()
+    opt.styles.link_style.paint(&link.url).to_string()
 }
 
 pub fn render_text(text: &Text, _opt: &RenderOptions) -> String {
@@ -75,13 +87,13 @@ pub fn render_text(text: &Text, _opt: &RenderOptions) -> String {
 
 pub fn render_emphasis(emph: &Emphasis, opt: &RenderOptions) -> String {
     let content = render_nodes(&emph.children, "", opt);
-    opt.emphasis_style.paint(&content).to_string()
+    opt.styles.emphasis_style.paint(&content).to_string()
     // format!("_{content}_")
 }
 
 pub fn render_strong(strong: &Strong, opt: &RenderOptions) -> String {
     let content = render_nodes(&strong.children, "", opt);
-    opt.bold_style.paint(&content).to_string()
+    opt.styles.bold_style.paint(&content).to_string()
 }
 
 pub fn render_paragraph(para: &Paragraph, opt: &RenderOptions) -> String {
@@ -90,7 +102,7 @@ pub fn render_paragraph(para: &Paragraph, opt: &RenderOptions) -> String {
 }
 
 pub fn render_inline_code(code: &InlineCode, opt: &RenderOptions) -> String {
-    opt.inline_code_style.paint(&code.value).to_string()
+    opt.styles.inline_code_style.paint(&code.value).to_string()
 }
 
 pub fn render_blockquote(quote: &BlockQuote, opt: &RenderOptions) -> String {
@@ -109,12 +121,13 @@ pub fn render_blockquote(quote: &BlockQuote, opt: &RenderOptions) -> String {
 pub fn render_code(code: &Code, opt: &RenderOptions) -> String {
     let before = format!(
         "{} {}",
-        opt.code_block_border_style.paint("╭"),
-        opt.bold_style
+        opt.styles.code_block_border_style.paint("╭"),
+        opt.styles
+            .bold_style
             .paint(code.lang.as_deref().unwrap_or_default())
     );
-    let after = opt.code_block_border_style.paint("╰");
-    let border = opt.code_block_border_style.paint("│ ").to_string();
+    let after = opt.styles.code_block_border_style.paint("╰");
+    let border = opt.styles.code_block_border_style.paint("│ ").to_string();
     let content = fill(
         &code.value,
         Options::with_termwidth()

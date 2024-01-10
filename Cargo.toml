@@ -8,6 +8,8 @@ description = "A text-mode Markdown viewer"
 
 [dependencies]
 anyhow = "1.0.79"
+log = "0.4"
+env_logger = "0.10"
 markdown = "1.0.0-alpha.16"
 nu-ansi-term = "0.49.0"
 textwrap = { version = "0.16.0", features = ["terminal_size"] }
